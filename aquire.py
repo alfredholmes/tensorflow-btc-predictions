@@ -9,7 +9,7 @@ with open('coinbaseUSD.csv', 'r') as csvfile:
     volume = 0
     usd_spent = 0
 
-    open = close = None
+    open_ = close = None
     high = low = None
 
     for row in reader:
@@ -18,7 +18,7 @@ with open('coinbaseUSD.csv', 'r') as csvfile:
             usd_spent = usd_spent + float(row[2]) * float(row[1])
             close = float(row[1])
             if open is None:
-                open = close
+                open_ = close
             if high is None or high < close:
                 high = close
             if low is None or low > close:
@@ -28,7 +28,7 @@ with open('coinbaseUSD.csv', 'r') as csvfile:
                 record[current_day] = [usd_spent / volume, volume, open, close, high, low]
                 volume = 0
                 usd_spent = 0
-                open = None
+                open_ = high = low = None
                 #print(str(current_day) + ': ' + str(usd_spent) + ' ' + str(volume))
             else:
                 record[current_day] = 0

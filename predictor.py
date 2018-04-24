@@ -9,7 +9,7 @@ input_length = 10
 output_length = 1
 #This is a first approximation, so just a standard neural network will be used, even though a RNN would be better
 #network has hidden_nodes nodes in the hidden layers and hidden_layers hidden layers
-hidden_nodes = 10
+hidden_nodes = 30
 n_hidden_layers = 4
 
 learning_rate = 0.001
@@ -50,7 +50,7 @@ def get_data():
     testing_output = []
     offset = 700
     testing_min_max = []
-    while offset < 1180:
+    while offset < 1179:
         #offset = random.randint(707, 1185)
         a = data[offset:offset + input_length]
         b = data[offset+input_length:offset+input_length + output_length]
@@ -110,7 +110,7 @@ saver = tf.train.Saver()
 
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
-    saver.restore(sess, "./save/network")
+    #saver.restore(sess, "./save/network")
     input_, output_,test_input_, test_output_, min_max = get_data()
 
     for i in range(1000):
@@ -119,6 +119,7 @@ with tf.Session() as sess:
 
     saver.save(sess, './save/network')
     result = sess.run(pred, feed_dict={input: test_input_, output: test_output_})
+    error = sess.run(error, feed_dict={input:test_input_, output:test_output_})
     with open('nn_predictions.csv', 'w') as csvfile:
         writer = csv.writer(csvfile)
 
@@ -129,13 +130,18 @@ with tf.Session() as sess:
             for j in range(len(test_output_[i])):
                 actual.append((test_output_[i][j] - 0.33) * 3 * (max - min) + min)
         p = []
+        e = []
         for i in range(len(result)):
             d = test_input_[i]
             [min, max] = min_max[i]
             for j in range(len(result[i])):
                 p.append((result[i][j] - 0.33) * 3 * (max - min) + min)
+            for j in range(len(error[i])):
+                e.append(error[i][j]**2)
+
         writer.writerow(actual)
         writer.writerow(p)
+        writer.writerow(e)
 
 
 
