@@ -50,7 +50,7 @@ def get_data():
     testing_output = []
     offset = 700
     testing_min_max = []
-    while offset < 1179:
+    while offset < 1150:
         #offset = random.randint(707, 1185)
         a = data[offset:offset + input_length]
         b = data[offset+input_length:offset+input_length + output_length]
@@ -110,7 +110,7 @@ saver = tf.train.Saver()
 
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
-    #saver.restore(sess, "./save/network")
+    saver.restore(sess, "./save/network")
     input_, output_,test_input_, test_output_, min_max = get_data()
 
     for i in range(1000):

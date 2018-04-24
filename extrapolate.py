@@ -2,7 +2,7 @@ import tensorflow as tf
 import csv, random
 
 #Constants
-start = 800
+start = 1030
 prediction_length = 100
 #neural network takes data from the last input_length days
 input_length = 10
@@ -14,6 +14,7 @@ hidden_nodes = 30
 n_hidden_layers = 4
 
 e = 0.007
+#e = 0
 #sd = 0.005
 
 #scale the prices in data in the
@@ -36,7 +37,7 @@ def scale(data, s = 1):
 def unscale(data, min, max, s = 1):
     a = []
     for d in data:
-        a.append((d - 0.33) * 3 * (max - min) + min)
+        a.append((d - (1.0 - 1.0 / s) / 2.0) * s * (max - min) + min)
 
     return a
 
@@ -92,7 +93,7 @@ with tf.Session() as sess:
 
     with open('extrapolation.csv', 'w') as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(price_data[start+input_length:start+input_length+prediction_length])
+        writer.writerow(price_data[start+input_length-10:start+input_length+prediction_length])
 
         for j in range(10):
             price_data, input_, min, max = get_data()
@@ -103,12 +104,16 @@ with tf.Session() as sess:
             price_prediction = []
             print('Run ' + str(j))
             for i in range(prediction_length):
-                result = float(sess.run(pred, feed_dict={input: input_})[0][0]) + random.gauss(0, e)
+                result = float(sess.run(pred, feed_dict={input: input_})[0][0]) + random.gauss(0, e**(0.5))
 
                 #result = result + e
 
 
                 price = unscale([result], min, max, 3)[0]
+
+                s = scale
+
+
                 #price = unscale([float(result) + random.gauss(0, error)], min, max, 3)[0]
 
                 if price < 0:
@@ -128,7 +133,7 @@ with tf.Session() as sess:
 
 
 
-            writer.writerow(price_prediction)
+            writer.writerow(10 * ['-'] + price_prediction)
             price_prediction = []
 
 
